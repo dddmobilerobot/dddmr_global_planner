@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node pkg="mcl_3dl" exec="pcl_publisher" output="screen" respawn="false">
+    <param from="$(find-pkg-share mcl_3dl)/config/pcl_publisher.yaml" />
+    <param name="map_dir" value="$(find-pkg-share global_planner)/data/map.pcd" />
+    <param name="ground_dir" value="$(find-pkg-share global_planner)/data/ground.pcd" />
+  </node>
+
+  <!--name argument is not required, because it will overwrite all node name in the exec-->
+  <node pkg="global_planner" exec="global_planner_node" output="screen" respawn="false">
+    <param from="$(find-pkg-share global_planner)/config/path_planning_on_static_layer.yaml" />
+  </node>
+
+  <!--- TF -->
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="map2baselink" args="-23.4 -109.0 5.54 0.0 0.0 0.0 /map /base_link" />
+
+  <let name="rviz_config" value="$(find-pkg-share global_planner)/rviz/path_planning_on_static_layer.rviz"/>
+  <node name="rviz2" pkg="rviz2" exec="rviz2" args="-d $(var rviz_config)"/>
+
+</launch>
+
