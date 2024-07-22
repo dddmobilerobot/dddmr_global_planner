@@ -34,3 +34,10 @@ cd ~/dddmr_navigation && source /opt/ros/humble/setup.bash && colcon build --sym
 source install/setup.bash
 ros2 launch global_planner path_planning_on_static_layer.launch
 ```
+#### Use Publish Point on Rviz2
+Use Publish Point plugin to give a goal to global planner.
+<p float='left'>
+    <img src="https://github.com/dddmobilerobot/dddmr_documentation_materials/blob/main/global_planner/global_planner_demo.png" width="640" height="400"/>
+</p>
+
+
