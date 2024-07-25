@@ -10,6 +10,10 @@ The [dddmr_perception_3d](https://github.com/dddmobilerobot/dddmr_perception_3d)
   </tr>
 </table> 
 
+<p align='center'>
+    <img src="https://github.com/dddmobilerobot/dddmr_documentation_materials/blob/main/global_planner/global_planner_diagram.png" width="640" height="420"/>
+</p>
+
 - [ ] TODO: Move boundary detection algorithm into the perception_3d as inflation layer.
 
 ## Run The Demo
