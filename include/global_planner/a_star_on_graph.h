@@ -102,6 +102,8 @@ class A_Star_on_Graph{
                                   perception_3d::StaticGraph& static_graph);
 
       void getPath( unsigned int start, unsigned int goal, std::vector<unsigned int>& path);
+      
+      void setupTurningWeight(double m_weight){turning_weight_ = m_weight;}
     private:
       pcl::PointCloud<pcl::PointXYZ>::Ptr pc_original_z_up_;
 
@@ -111,5 +113,10 @@ class A_Star_on_Graph{
       
       /*Create the list*/
       AstarList* ASLS_;
+
+      //@ turning weight of the node
+      double turning_weight_;
+
+      double getThetaFromParent2Expanding(pcl::PointXYZ m_pcl_current_parent, pcl::PointXYZ m_pcl_current, pcl::PointXYZ m_pcl_expanding);
 };
 

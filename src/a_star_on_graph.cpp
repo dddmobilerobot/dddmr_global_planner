@@ -129,6 +129,32 @@ void A_Star_on_Graph::updateGraph(pcl::PointCloud<pcl::PointXYZ>::Ptr pc_origina
   ASLS_->setGraph(static_graph_);
 }
 
+double A_Star_on_Graph::getThetaFromParent2Expanding(pcl::PointXYZ m_pcl_current_parent, pcl::PointXYZ m_pcl_current, pcl::PointXYZ m_pcl_expanding){
+  //@ calculate vector: parent -> current
+  float vx1, vy1;
+  vx1 = m_pcl_current.x - m_pcl_current_parent.x;
+  vy1 = m_pcl_current.y - m_pcl_current_parent.y;
+  //@ calculate vector: current -> expanding
+  float vx2, vy2;
+  vx2 = m_pcl_expanding.x - m_pcl_current.x;
+  vy2 = m_pcl_expanding.y - m_pcl_current.y;
+  float cos_theta = (vx1*vx2 + vy1*vy2)/(sqrt(vx1*vx1+vy1*vy1)*sqrt(vx2*vx2+vy2*vy2));
+  if(fabs(cos_theta)>1)
+    cos_theta = 1.0;
+  double theta_of_vector = acos(cos_theta);
+  if(vx1==0 && vy1==0)
+    theta_of_vector = 0;
+  else if(vx2==0 && vy2==0)
+    theta_of_vector = 0;
+  else if(fabs(fabs(vx1)-fabs(vx2))<=0.0001)
+    theta_of_vector = 0;
+  
+  if(fabs(theta_of_vector)<=0.345)//cap
+    theta_of_vector = 0.0;
+
+  return theta_of_vector;
+}
+
 void A_Star_on_Graph::getPath(
   unsigned int start, unsigned int goal,
   std::vector<unsigned int>& path){
@@ -170,9 +196,14 @@ void A_Star_on_Graph::getPath(
       
       double factor = exp(-1.0 * inflation_descending_rate * (dGraphValue - inscribed_radius));
 
-      float new_g = current_node.g + (*it).second * static_graph_.getNodeWeight((*it).first) + factor * 1.0;
-      pcl::PointXYZ pcl_current = pc_original_z_up_->points[(*it).first];
-      float new_h = sqrt(pcl::geometry::squaredDistance(pcl_current, pcl_goal));
+      //@ get current_parent, current, expanding to compute theta od expanding
+      pcl::PointXYZ pcl_current = pc_original_z_up_->points[current_node.self_index];
+      pcl::PointXYZ pcl_current_parent = pc_original_z_up_->points[current_node.parent_index];
+      pcl::PointXYZ pcl_expanding = pc_original_z_up_->points[(*it).first];
+      double theta = getThetaFromParent2Expanding(pcl_current_parent, pcl_current, pcl_expanding);
+
+      float new_g = current_node.g + (*it).second * static_graph_.getNodeWeight((*it).first) + factor * 1.0 + theta*turning_weight_;
+      float new_h = sqrt(pcl::geometry::squaredDistance(pcl_expanding, pcl_goal));
       float new_f = new_g + new_h;
 
       Node_t new_node = {.self_index=((*it).first), .g=new_g, .h=new_h, .f=new_f, .parent_index=current_node.self_index, .is_closed=false, .is_opened=true};

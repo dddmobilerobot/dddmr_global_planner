@@ -97,8 +97,11 @@ void Global_Planner::initial(const std::shared_ptr<perception_3d::Perception3D_R
   declare_parameter("boundary_reject_threshold", rclcpp::ParameterValue(15));
   this->get_parameter("boundary_reject_threshold", boundary_reject_threshold_);
   RCLCPP_INFO(this->get_logger(), "boundary_reject_threshold: %d", boundary_reject_threshold_);    
-
-
+  
+  declare_parameter("turning_weight", rclcpp::ParameterValue(0.1));
+  this->get_parameter("turning_weight", turning_weight_);
+  RCLCPP_INFO(this->get_logger(), "turning_weight: %.2f", turning_weight_);    
+  
   tf_listener_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
   action_server_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
   //@Initialize transform listener and broadcaster
@@ -535,6 +538,7 @@ void Global_Planner::radiusSearchConnection(){
   if(!has_initialized_){
     has_initialized_ = true;
     a_star_planner_ = std::make_shared<A_Star_on_Graph>(pc_original_z_up_, static_graph_, perception_3d_ros_);
+    a_star_planner_->setupTurningWeight(turning_weight_);
   }
   else{
     a_star_planner_->updateGraph(pc_original_z_up_, static_graph_);

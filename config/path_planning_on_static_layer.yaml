@@ -18,3 +18,4 @@ global_planner:
     adaptive_connection_number: 20
     radius_of_ground_connection: 1.5 #If use_adaptive_connection=false, the radius search of the node is applied.
     boundary_reject_threshold: 12 #if connection number of a node is lower than this value, we consider this node as boundary, make the robot less prefer, noted that this value is related to the resolution of ground
+    turning_weight: 0.1 #Punish the zig-zag path
