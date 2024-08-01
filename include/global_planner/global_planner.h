@@ -125,6 +125,8 @@ class Global_Planner : public rclcpp::Node {
       double radius_of_ground_connection_;
       int boundary_reject_threshold_;
       double turning_weight_;
+      double intensity_search_radius_;
+      double intensity_search_punish_weight_;
       
       /*Original point cloud*/
       pcl::PointCloud<pcl::PointXYZ>::Ptr pc_original_z_up_;

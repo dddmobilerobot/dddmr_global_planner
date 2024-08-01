@@ -101,7 +101,15 @@ void Global_Planner::initial(const std::shared_ptr<perception_3d::Perception3D_R
   declare_parameter("turning_weight", rclcpp::ParameterValue(0.1));
   this->get_parameter("turning_weight", turning_weight_);
   RCLCPP_INFO(this->get_logger(), "turning_weight: %.2f", turning_weight_);    
-  
+
+  declare_parameter("intensity_search_radius", rclcpp::ParameterValue(1.0));
+  this->get_parameter("intensity_search_radius", intensity_search_radius_);
+  RCLCPP_INFO(this->get_logger(), "intensity_search_radius: %.2f", intensity_search_radius_);    
+
+  declare_parameter("intensity_search_punish_weight", rclcpp::ParameterValue(0.1));
+  this->get_parameter("intensity_search_punish_weight", intensity_search_punish_weight_);
+  RCLCPP_INFO(this->get_logger(), "intensity_search_punish_weight: %.2f", intensity_search_punish_weight_);    
+
   tf_listener_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
   action_server_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
   //@Initialize transform listener and broadcaster
@@ -477,7 +485,7 @@ void Global_Planner::radiusSearchConnection(){
     }
 
     float weight = 1.0;
-    float max_radius = 1.0; //this value is suggested to be 1.0 meters, because if it is too large, the narrow passage will be miscalculated
+    float max_radius = intensity_search_radius_; //this value is suggested to be 1.0 meters, because if it is too large, the narrow passage will be miscalculated
 
     //@ consider this scenario to be boundary of ground
     if(nn_pc->points.size()<5){
@@ -504,7 +512,7 @@ void Global_Planner::radiusSearchConnection(){
       //@We use polar coordinate to generate points (i.e.: iterate theta with given radius)
       //@We search multiple rings
       int reject_threshold = 0;
-      for(float ring_radius=max_radius; ring_radius>0; ring_radius-=0.5){
+      for(float ring_radius=max_radius; ring_radius>0; ring_radius-=0.25){
         for(float d_theta=-3.1415926; d_theta<=3.1415926; d_theta+=0.174){ //per 10 deg
           pcl::PointXYZ pcl_ring;
           pcl_ring.x = pcl_node.x + ring_radius*sin(d_theta);
@@ -519,13 +527,13 @@ void Global_Planner::radiusSearchConnection(){
           //@Search around the ring
           std::vector<int> pointIdxRadiusSearch_ring;
           std::vector<float> pointRadiusSquaredDistance_ring;
-          if(kdtree_original_->radiusSearch (pcl_ring, 0.3, pointIdxRadiusSearch_ring, pointRadiusSquaredDistance_ring)<1) //0.3 is related to resolutio, looks good for 0.5 m voxel
+          if(kdtree_original_->radiusSearch (pcl_ring, 0.3, pointIdxRadiusSearch_ring, pointRadiusSquaredDistance_ring)<1) //0.3 is related to resolution, looks good for 0.5 m voxel
             reject_threshold++;
         }
       }
 
       if(reject_threshold>boundary_reject_threshold_)
-        weight = reject_threshold*0.5; //0.5 is to be justified, because it is related to voxel size
+        weight = reject_threshold*intensity_search_punish_weight_;
     }
     
     static_graph_.insertWeight(index_cnt, weight);//make the value of weight to 1 for non-weighted A*
