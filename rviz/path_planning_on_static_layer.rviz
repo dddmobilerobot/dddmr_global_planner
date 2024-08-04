@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /Map1/Topic1
         - /Ground1/Autocompute Value Bounds1
-        - /WeightedGround1/Topic1
+        - /WeightedGround(sGraph)1/Topic1
         - /GlobalPath1/Topic1
       Splitter Ratio: 0.6117647290229797
     Tree Height: 395
@@ -27,7 +27,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: WeightedGround
+    SyncSource: WeightedGround(sGraph)
 Visualization Manager:
   Class: ""
   Displays:
@@ -124,7 +124,7 @@ Visualization Manager:
       Max Intensity: 10
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: WeightedGround
+      Name: WeightedGround(sGraph)
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
@@ -140,6 +140,40 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: false
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: false
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 1
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: dGraph(StaticLayer)
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.30000001192092896
+      Style: Tiles
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /map/dGraph
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: false
     - Alpha: 1
       Buffer Length: 1
       Class: rviz_default_plugins/Path
@@ -226,7 +260,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/XYOrbit
-      Distance: 51.62064743041992
+      Distance: 37.942405700683594
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

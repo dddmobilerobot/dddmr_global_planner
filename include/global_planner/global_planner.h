@@ -77,6 +77,7 @@ type edge_t is inside here
 #include <nav_msgs/msg/path.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
+
 namespace global_planner
 {
 
@@ -120,19 +121,15 @@ class Global_Planner : public rclcpp::Node {
       bool graph_ready_;
       bool has_initialized_;
       
-      bool use_adaptive_connection_;
-      int adaptive_connection_number_;
-      double radius_of_ground_connection_;
-      int boundary_reject_threshold_;
       double turning_weight_;
-      double intensity_search_radius_;
-      double intensity_search_punish_weight_;
-      
+
       /*Original point cloud*/
-      pcl::PointCloud<pcl::PointXYZ>::Ptr pc_original_z_up_;
+      pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ground_;
+      pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_map_;
       /*Original kdtree*/
-      pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree_original_; 
-      
+      pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree_ground_; 
+      pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree_map_; 
+
       /*
       Graph class:
       static: similar to static layer in costmap_2d
@@ -148,7 +145,6 @@ class Global_Planner : public rclcpp::Node {
       rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub_weighted_pc_;
 
       /*cb*/
-      bool use_static_layer_in_perception_3d_;
       rclcpp::TimerBase::SharedPtr perception_3d_check_timer_;
       void checkPerception3DThread();
       void cbMapcloud(const sensor_msgs::msg::PointCloud2::SharedPtr msg);
@@ -156,7 +152,8 @@ class Global_Planner : public rclcpp::Node {
       
 
       /*Func*/
-      void radiusSearchConnection();
+      void postSmoothPath(std::vector<unsigned int>& path_id, std::vector<unsigned int>& smoothed_path_id);
+      void getStaticGraphFromPerception3D();
 
       bool getStartGoalID(const geometry_msgs::msg::PoseStamped& start, const geometry_msgs::msg::PoseStamped& goal, 
                           unsigned int& start_id, unsigned int& goal_id);
