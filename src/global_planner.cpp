@@ -284,7 +284,8 @@ void Global_Planner::postSmoothPath(std::vector<unsigned int>& path_id, std::vec
       double dy = vy*step;
       double dr = sqrt(dx*dx+dy*dy);
       double dz = fabs(vz*step);
-      if(dr>0.5 && atan2(dz,dr)>0.035){
+      float vertical_angle = std::asin(dz / dr);
+      if(dr>0.5 && vertical_angle>0.349){
         //@ z jump
         smoothed_path_id.push_back(path_id[it]);
         current_pst = next_pst;
@@ -442,6 +443,7 @@ void Global_Planner::makePlan(const std::shared_ptr<rclcpp_action::ServerGoalHan
   unsigned int start_id, goal_id;
   std::vector<unsigned int> path;
   std::vector<unsigned int> smoothed_path;
+  std::vector<unsigned int> smoothed_path_2nd;
   nav_msgs::msg::Path ros_path;
 
   //@ WE dont rely on the start from service call, global plan is always start at baselink using tf
